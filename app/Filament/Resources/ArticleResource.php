@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TagsInput;
 
+use Filament\Forms\Components\Radio;
+
 class ArticleResource extends Resource
 {
     protected static ?string $model = Article::class;
@@ -32,8 +34,10 @@ class ArticleResource extends Resource
                     ->required()
                     ->minLength(3)
                     ->maxLength(255),
+
                 Forms\Components\Textarea::make('article_text')->rows(10) ->cols(20)
                     ->required(),
+
                 Forms\Components\Select::make('tags')
                     ->multiple()
                     ->relationship(titleAttribute: 'name')
@@ -41,6 +45,12 @@ class ArticleResource extends Resource
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')
                             ->required()->unique(),]),
+                
+                Forms\Components\Radio::make('published')
+                            ->options([
+                                '0' => 'Vázlat',
+                                '1' => 'Publikálva'
+                            ])
             ]);
     }
 

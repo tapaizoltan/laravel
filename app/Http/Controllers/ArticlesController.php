@@ -14,7 +14,10 @@ class ArticlesController extends Controller
      */
     public function index()
     {
-        $articles = Article::all();
+        //$articles = Article::all();
+        $articles = Article::query()
+        ->where('published', 'LIKE', "1")
+        ->get();
         return view('articles.index', compact('articles'));
     }
 
