@@ -19,10 +19,10 @@ use Filament\Forms\Components\TagsInput;
 class ArticleResource extends Resource
 {
     protected static ?string $model = Article::class;
-    protected static ?string $title = 'Custom Page Title';
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
-    protected static ?string $navigationLabel = 'Cikkek';
-    protected static ?string $pluralModellabel = "Cikkek";
+    //protected static ?string $navigationLabel = 'cikkek';
+    protected static ?string $modelLabel = 'cikk';
+    protected static ?string $pluralModelLabel = 'cikkek';
 
     public static function form(Form $form): Form
     {
@@ -49,7 +49,7 @@ class ArticleResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')->label('Cikkek')->searchable()->icon('heroicon-m-newspaper'),
-                Tables\Columns\TextColumn::make('tags.name')->label('Tag-ek')->icon('heroicon-m-tag'),
+                Tables\Columns\TextColumn::make('tags.name')->label('Tag-ek')->icon('heroicon-m-tag')->badge(),
             ])
             ->filters([
                 //

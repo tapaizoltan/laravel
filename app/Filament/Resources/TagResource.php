@@ -19,7 +19,9 @@ class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
     protected static ?string $navigationIcon = 'heroicon-o-tag';
-    protected static ?string $navigationLabel = 'Tag-ek';
+    //protected static ?string $navigationLabel = 'Tag-ek';
+    protected static ?string $modelLabel = 'tag';
+    protected static ?string $pluralModelLabel = 'tag-ek';
 
     public static function form(Form $form): Form
     {
@@ -33,7 +35,7 @@ class TagResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->label('Tag-ek')->searchable()->sortable()->icon('heroicon-m-tag'),
+                Tables\Columns\TextColumn::make('name')->label('Tag-ek')->searchable()->sortable()->icon('heroicon-m-tag')->badge(),
             ])
             ->filters([
                 //
