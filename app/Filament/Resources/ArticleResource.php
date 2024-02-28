@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ArticleResource\Pages;
 use App\Filament\Resources\ArticleResource\RelationManagers;
-use App\Models\Article;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,10 +12,14 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+//saját use-ok
+use App\Models\Article;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TagsInput;
-
 use Filament\Forms\Components\Radio;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 
 class ArticleResource extends Resource
 {
@@ -30,27 +33,45 @@ class ArticleResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->required()
-                    ->minLength(3)
-                    ->maxLength(255),
+                Grid::make(4)
+                ->schema([
+                    Section::make('Rate limiting')
+                    //->description('Prevent abuse by limiting the number of requests per period')
+                    ->schema([
+                        Forms\Components\TextInput::make('title')
+                            ->required()
+                            ->minLength(3)
+                            ->maxLength(255),
+
+                        Forms\Components\Select::make('tags')
+                            ->multiple()
+                            ->relationship(titleAttribute: 'name')
+                            ->preload()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->required()->unique(),]),
+                        ])->columnSpan(3),
+
+                        Section::make()
+                        //->description('Prevent abuse by limiting the number of requests per period')
+                        ->schema([
+                            Forms\Components\Radio::make('published')
+                        ->options([
+                            '0' => 'Vázlat',
+                            '1' => 'Publikálva'
+                        ]),
+                        ])->columnSpan(1),
+                        
+                    ]),
+
+
+
+                
 
                 Forms\Components\Textarea::make('article_text')->rows(10) ->cols(20)
-                    ->required(),
+                    ->required()->columnSpan(2),
 
-                Forms\Components\Select::make('tags')
-                    ->multiple()
-                    ->relationship(titleAttribute: 'name')
-                    ->preload()
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('name')
-                            ->required()->unique(),]),
                 
-                Forms\Components\Radio::make('published')
-                            ->options([
-                                '0' => 'Vázlat',
-                                '1' => 'Publikálva'
-                            ])
             ]);
     }
 
@@ -58,8 +79,21 @@ class ArticleResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')->label('Cikkek')->searchable()->icon('heroicon-m-newspaper'),
+                Tables\Columns\TextColumn::make('title')->label('Cikkek')->searchable()->icon('heroicon-m-newspaper')->tooltip('Cikkek'),
                 Tables\Columns\TextColumn::make('tags.name')->label('Tag-ek')->icon('heroicon-m-tag')->badge(),
+                Tables\Columns\IconColumn::make('published')
+                    ->icon(fn (string $state): string => match ($state) {
+                        '0' => 'heroicon-o-pencil',
+                        '1' => 'heroicon-o-check-circle',
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        '0' => 'info',
+                        '1' => 'success',
+                        //default => 'gray',
+                    })
+                    ->label('Státusz')
+                    ->size('md'),
+
             ])
             ->filters([
                 //

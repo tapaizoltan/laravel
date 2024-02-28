@@ -16,7 +16,7 @@ class ArticlesController extends Controller
     {
         //$articles = Article::all();
         $articles = Article::query()
-        ->where('published', 'LIKE', "1")
+        ->where('published', 'LIKE', 1) // ->where('name', 'LIKE', "%{$search}%") <---- ha visszakapjuk egy formtól a $search válozót mondjuk egy kereső mező által
         ->get();
         return view('articles.index', compact('articles'));
     }
