@@ -20,6 +20,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\RichEditor;
 
 class ArticleResource extends Resource
 {
@@ -33,17 +34,20 @@ class ArticleResource extends Resource
     {
         return $form
             ->schema([
+                
                 Grid::make(4)
                 ->schema([
-                    Section::make('Rate limiting')
-                    //->description('Prevent abuse by limiting the number of requests per period')
+                    Section::make() //Section::make('Ez az adott szekció címének gejelölése')
+                    //->description('Ez az adott szekció címének leírása')
                     ->schema([
                         Forms\Components\TextInput::make('title')
+                            ->label('Cikk címe')
                             ->required()
                             ->minLength(3)
                             ->maxLength(255),
 
                         Forms\Components\Select::make('tags')
+                            ->label('Cikk besorolása')
                             ->multiple()
                             ->relationship(titleAttribute: 'name')
                             ->preload()
@@ -52,26 +56,31 @@ class ArticleResource extends Resource
                                     ->required()->unique(),]),
                         ])->columnSpan(3),
 
-                        Section::make()
-                        //->description('Prevent abuse by limiting the number of requests per period')
+                        Section::make() //Section::make('Ez az adott szekció címének gejelölése')
+                        //->description('Ez az adott szekció címének leírása')
                         ->schema([
                             Forms\Components\Radio::make('published')
-                        ->options([
-                            '0' => 'Vázlat',
-                            '1' => 'Publikálva'
-                        ]),
-                        ])->columnSpan(1),
+                            ->options([
+                                '0' => 'Vázlat',
+                                '1' => 'Publikálva'
+                            ])->label('Publikálás státusza'),
+
+                    ])->columnSpan(1),
                         
-                    ]),
+                ]),
 
+                Grid::make(4)
+                ->schema([
+                    
+                    Forms\Components\RichEditor::make('article_text')
+                    ->required()->label('Cikk tartalma')->columnSpan(3),
+                    
+                    /*
+                    Forms\Components\Textarea::make('article_text')->rows(10) ->cols(20)
+                    ->required()->columnSpan(3),
+                    */
+                ]),
 
-
-                
-
-                Forms\Components\Textarea::make('article_text')->rows(10) ->cols(20)
-                    ->required()->columnSpan(2),
-
-                
             ]);
     }
 

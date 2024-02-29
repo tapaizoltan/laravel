@@ -13,7 +13,7 @@
     <div class="articlesBox">
         <div class="articleTitle">{{$article->title}}</div>
         <div class="articleSectionLabel"><b>Létrehozva: </b>{{$article->created_at}}</div>
-        <div class="articleText">{{$article->article_text}}</div>
+        <div class="articleText">{!!$article->article_text!!}</div>
         <div class="articleTagLabel"><b>Tag-ek:</b></div>
         <div class="articleTag">
             @foreach ($article->tags as $singleTag)
