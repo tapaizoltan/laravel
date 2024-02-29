@@ -2,7 +2,7 @@
 clear
 
 # ezt kell beleírnom : mysqldump --host="mysql" --user="root" --password="root" laravel > laravel.sql
-
+mysqldump -h mysql --user="root" --password="root" laravel > laravel.sql
 # - CONFIG START -
 
 # SQL szerver config
@@ -10,7 +10,7 @@ sqluser=root
 sqlpassword=B594tC56@tapai
 
 # GIT szerver config
-repository_url=
+repository_url=https://github.com/tapaizoltan/laravel-gyakorlo.git
 
 # FTP szerver 1 config
 scpserver=192.168.2.98
