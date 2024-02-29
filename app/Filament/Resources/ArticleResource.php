@@ -21,6 +21,10 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\RichEditor;
+use Filament\Tables\Columns\Layout\Panel;
+use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 
 class ArticleResource extends Resource
 {
@@ -37,7 +41,7 @@ class ArticleResource extends Resource
                 
                 Grid::make(4)
                 ->schema([
-                    Section::make() //Section::make('Ez az adott szekció címének gejelölése')
+                    Section::make() //Section::make('Ez az adott szekció címének megjelölése')
                     //->description('Ez az adott szekció címének leírása')
                     ->schema([
                         Forms\Components\TextInput::make('title')
@@ -62,12 +66,17 @@ class ArticleResource extends Resource
                             Forms\Components\Radio::make('published')
                             ->options([
                                 '0' => 'Vázlat',
-                                '1' => 'Publikálva'
-                            ])->label('Publikálás státusza'),
+                                '1' => 'Publikált'
+                            ])
+                            ->default(0)
+                            ->descriptions([
+                                '0' => 'Így nincs publikálva a cikk.',
+                                '1' => 'Elérhető a külvilág számára.'])
+                            ->label('Publikálás státusza'),
 
                     ])->columnSpan(1),
                         
-                ]),
+                ]), 
 
                 Grid::make(4)
                 ->schema([
@@ -82,14 +91,16 @@ class ArticleResource extends Resource
                 ]),
 
             ]);
+        
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            //->description('teszt') //ez egy rövid leírás a tábláról a tábla fejlécében
             ->columns([
-                Tables\Columns\TextColumn::make('title')->label('Cikkek')->searchable()->icon('heroicon-m-newspaper')->tooltip('Cikkek'),
-                Tables\Columns\TextColumn::make('tags.name')->label('Tag-ek')->icon('heroicon-m-tag')->badge(),
+                Tables\Columns\TextColumn::make('title')->label('Cikkek')->searchable()->icon('heroicon-m-newspaper'), // ->tooltip('Cikkek')
+                Tables\Columns\TextColumn::make('tags.name')->label('Tag-ek')->searchable()->icon('heroicon-m-tag')->badge(),
                 Tables\Columns\IconColumn::make('published')
                     ->icon(fn (string $state): string => match ($state) {
                         '0' => 'heroicon-o-pencil',
@@ -102,10 +113,16 @@ class ArticleResource extends Resource
                     })
                     ->label('Státusz')
                     ->size('md'),
-
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('published')
+                    ->query(fn (Builder $query) => $query->where('published', true)),
+                    Tables\Filters\SelectFilter::make('published')
+                    ->label('Publikálás státusza')
+                    ->options([
+                        '0' => 'Vázlat',
+                        '1' => 'Publikált',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->label('Szerkesztés')->link(),
@@ -133,4 +150,5 @@ class ArticleResource extends Resource
             'edit' => Pages\EditArticle::route('/{record}/edit'),
         ];
     }
+
 }
