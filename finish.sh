@@ -1,133 +1,33 @@
-#!/bin/sh
-clear
+#! /bin/bash
+project_name=laravel
+project_folder=laravel
 
-# ezt kell beleírnom : mysqldump --host="mysql" --user="root" --password="root" laravel > laravel.sql
-mysqldump -h mysql --user="root" --password="root" laravel > laravel.sql
-# - CONFIG START -
+today="$(date '+%Y-%m-%d')"
 
 # SQL szerver config
-sqluser=root
-sqlpassword=B594tC56@tapai
+db_host=mysql
+db_port=3306
+db_database=laravel
+db_username=root
+db_password=root
 
-# GIT szerver config
-repository_url=https://github.com/tapaizoltan/laravel-gyakorlo.git
+clear
 
-# FTP szerver 1 config
-scpserver=192.168.2.98
-scpserverprootort=22
-scpserveruser=tapaizoltan
-scpserverpassword=B594tC56@tapai
-scpserverremotepath=Desktop
-
-# Szerver vagy helyi mentési beállítás. Az értéke lehet: scpserver1, scpserver2, remotefolder, local
-selectedserver=local
-
-# - CONFIG END -
-
-echo "•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••"
-echo "••     BrunchMAN Helyi vagy Felhőzött Biztonságimentő Script     ••"
-echo "••           BrunchMAN Local or Cloudy Backup Script             ••"
-echo "••                      v2.2 build221114                         ••"
-echo "•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••"
-rm /var/www/html/backuplog.txt
-
-sleep 2
-
-echo $(date) ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••• >> /var/www/html/backuplog.txt
-echo $(date) ••     BrunchMAN Helyi vagy Felhőzött Biztonságimentő Script     •• >> /var/www/html/backuplog.txt
-echo $(date) ••           BrunchMAN Local or Cloudy Backup Script             •• >> /var/www/html/backuplog.txt
-echo $(date) ••                     v2.2 build221114                          •• >> /var/www/html/backuplog.txt
-echo $(date) ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••• >> /var/www/html/backuplog.txt
-
-echo "4/1-es fázis - Korábbi adatmentések törlése..."
-echo $(date) 4/1-es fázis - Korábbi adatmentések törlése... >> /var/www/html/backuplog.txt
+# Adatbázis mentés
+echo "MySql adatok mentese..."
 sleep 1
-rm /var/www/html/backup/brunchman_backup_*.zip
-echo ""
-echo "4/1-es fázis - Adatok törlése megtörtént!"
-echo $(date) 4/1-es fázis - Adatok törlése megtörtént! >> /var/www/html/backuplog.txt
+mysqldump --host="$db_host" --port="$db_port" --user="$db_username" --password="$db_password" $db_database > /var/www/html/$project_folder/database/backup/$db_database-$today.sql
+echo $(date) /database/backup/$db_database-$today.sql: mysqldump >> /var/www/html/$project_folder/storage/logs/daily_finish.log
+echo "MySql adatok mentese... OK!"
 
-sleep 1
+# Git repository feltöltés
 
-echo ""
-echo "4/2-es fázis - SQL adatbázis mentése..."
-echo $(date) 4/2-es fázis - SQL adatbázis mentése... >> /var/www/html/backuplog.txt
-sleep 1
-today="$(date '+%Y-%m-%d')"
-rm /var/www/html/brunchman/backup/*.sql
-mysqldump --user="$sqluser" --password="$sqlpassword" brunchman > /var/www/html/brunchman/backup/brunchman-$today.sql
-echo ""
-echo "4/2-es fázis - SQL adatbázis mentése megtörtént!"
-echo $(date) 4/2-es fázis - SQL adatbázis mentése megtörtént! >> /var/www/html/backuplog.txt
-
-sleep 1
-
-echo ""
-echo "4/3-as fázis - Fájlok tömörítése..."
-echo $(date) 4/3-as fázis - Fájlok tömörítése... >> /var/www/html/backuplog.txt
-sleep 1
-zip -r brunchman_backup_$today.zip /var/www/html/brunchman/
-echo ""
-echo "4/3-as fázis - Fájlok tömörítése megtörtént!"
-echo $(date) 4/3-as fázis - Fájlok tömörítése megtörtén! >> /var/www/html/backuplog.txt
-
-sleep 1
-
-if [ "$selectedserver" = local ];
-	then
-        echo ""
-        echo "4/4-as fázis - A biztonsági mentés helyi mappába sikerült!"
-        echo $(date) 4/4-as fázis - Adatmentés helyi mappába sikerült! >> /var/www/html/backuplog.txt
-		sleep 1
-		echo "További szép napot!"
-        echo $(date) További szép napot! >> /var/www/html/backuplog.txt
-		sleep 3
-		clear
-    fi
-if [ "$selectedserver" = remotefolder ];
-	then
-        echo ""
-        echo "4/4 - Adatmentés helyi mappába..."
-        echo $(date) 4/4-as fázis - Adatmentés mentése helyi mappába... >> /var/www/html/backuplog.txt
-        sleep 1
-        mv venture_flame_full_backup_$today.zip /var/www/html/backup/venture_flame_full_backup_$today.zip
-        echo ""
-        echo "A biztonsági mentés helyi mappába sikerült!"
-        echo $(date) 4/4-as fázis - Adatmentés helyi mappába megtörtén! >> /var/www/html/backuplog.txt
-		sleep 1
-		echo "További szép napot!"
-		sleep 2
-		clear
-    fi
-if [ "$selectedserver" = scpserver1 ];
-	then
-        echo ""
-        echo "4/4 - Adatmentés feltöltése felhőbe..."
-        echo $(date) 4/4-as fázis - Adatmentés feltöltése felhőbe... >> /var/www/html/backuplog.txt
-        sleep 1
-        mv venture_flame_full_backup_$today.zip /var/www/html/backup/venture_flame_full_backup_$today.zip
-        sshpass -p $scpserverpassword1 scp -P$scpserverport1 venture_flame_full_backup_$today.zip $scpserveruser1@$scpserver1:/$scpserverremotepath1/
-        echo ""
-        echo "A biztonsági mentés feltöltése sikerült!"
-        echo $(date) 4/4-as fázis - Adatmentés feltöltése megtörtén! >> /var/www/html/backuplog.txt
-		sleep 1
-		echo "További szép napot!"
-		sleep 2
-		clear
-	fi
-if [ "$selectedserver" = scpserver2 ];
-	then
-        echo ""
-        echo "4/4 - Adatmentés feltöltése felhőbe..."
-        echo $(date) 4/4-as fázis - Adatmentés feltöltése felhőbe... >> /var/www/html/backuplog.txt
-        sleep 1
-        mv venture_flame_full_backup_$today.zip /var/www/html/backup/venture_flame_full_backup_$today.zip
-		sshpass -p $scpserverpassword2 scp -P$scpserverport2 venture_flame_full_backup_$today.zip $scpserveruser2@$scpserver2:/$scpserverremotepath2/
-        echo ""
-        echo "A biztonsági mentés feltöltése sikerült!"
-        echo $(date) 4/4-as fázis - Adatmentés feltöltése megtörtén! >> /var/www/html/backuplog.txt
-		sleep 1
-		echo "További szép napot!"
-		sleep 2
-		clear
-	fi
+# echo "Napi munka feltoltese a Git repository-ba..."
+# sleep 1
+# git add --all
+# git commit -m "Napi munka feltoltese a Git repository-ba."
+# git fetch
+# git push -u origin main
+# echo $(date) origin main: git push >> /storage/logs/daily_finish.log
+# echo "Napi munka feltoltese a Git repository-ba... OK!"
+# echo "Jo pihenest! ;-)"
